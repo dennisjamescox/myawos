@@ -31,18 +31,28 @@ hours_minutes = zulutime.strftime("%H%M")
 weatherFile = open('/home/pi/weather_station/weather.txt', 'w')
 
 print(f"{hours_minutes}", file = weatherFile)
-# wind direction
 
-print(f"{conditions.integrated_sensor_suites[0].wind_dir_at_hi_speed_last_10_min}", file = weatherFile)
-# wind speed    
-print(f"{conditions.integrated_sensor_suites[0].wind_speed_hi_last_10_min}", file = weatherFile)
+# wind direction
+wind_direction = conditions.integrated_sensor_suites[0].wind_dir_at_hi_speed_last_10_min
+print(wind_direction, file = weatherFile)
+
+
+# wind speed
+wind_speed = conditions.integrated_sensor_suites[0].wind_speed_hi_last_10_min
+print(f"{round(wind_speed)}", file = weatherFile)
+
 # altimeter    
-print(f"{conditions.barometric.bar_sea_level}", file = weatherFile)
+altimeter = conditions.barometric.bar_sea_level
+print(f"{round(altimeter,2)}", file = weatherFile)
+
 # outside temp    
-print(f"{conditions.integrated_sensor_suites[0].temp}", file = weatherFile)
+temp_in_c = conditions.integrated_sensor_suites[0].temp
+print(f"{round(temp_in_c)}", file = weatherFile)
+
 # dewpoint
-print(f"{conditions.integrated_sensor_suites[0].dew_point}", file = weatherFile)
-#    time.sleep(60)
+dew_point = conditions.integrated_sensor_suites[0].dew_point
+print(f"{round(dew_point)}", file = weatherFile)
+
 
 
 weatherFile.close()

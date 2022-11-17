@@ -13,6 +13,7 @@ print GENERATE "sox /home/pi/weather_station/media/WeatherStation_intro.wav ";
 
 $linecounter = 0;
 
+# go thru each line of the weather.txt file and generate a script of media files
 while($line = <WEATHER>)
 {
 
@@ -49,24 +50,11 @@ while($line = <WEATHER>)
 	# doing wind
 	print GENERATE "/home/pi/weather_station/media/WeatherStation_at.wav ";
 
-	$ceil = ceil($line);
-
-	$arraycount = length($ceil);
-	generate_from_array($ceil);
+	generate_from_array($line);
 
 	print GENERATE "/home/pi/weather_station/media/WeatherStation_knot.wav ";
 
 	
-	
-    }
-    elsif($linecounter == 5)
-    {
-	# doing dewpoint
-	print GENERATE "/home/pi/weather_station/media/WeatherStation_dewpoint.wav ";
-
-	$arraycount = 2;
-	generate_from_array($line);
-
 	
     }
     # Altimeter
@@ -75,12 +63,6 @@ while($line = <WEATHER>)
 	# doing altimeter
 	print GENERATE "/home/pi/weather_station/media/WeatherStation_altimeter.wav ";
 
-	if(length($line) > 5)
-	{
-	    $short = substr( $line, 0, 5 );
-	    $line = $short;
-	}
-	$arraycount = 5;
 	generate_from_array($line);
 
     }
@@ -89,8 +71,16 @@ while($line = <WEATHER>)
     {
 	print GENERATE "/home/pi/weather_station/media/WeatherStation_temp.wav ";
 
-	$arraycount = 2;
 	generate_from_array($line);
+
+    }
+    elsif($linecounter == 5)
+    {
+	# doing dewpoint
+	print GENERATE "/home/pi/weather_station/media/WeatherStation_dewpoint.wav ";
+
+	generate_from_array($line);
+
     }
     else
     {
@@ -100,8 +90,6 @@ while($line = <WEATHER>)
    $linecounter++;
 	    
 
-# round temp down
-# round dewpoint down
 # round altimter down
 # round wind up
 # replace wind direction digit with 0
@@ -110,7 +98,7 @@ while($line = <WEATHER>)
 
 # okay - now generate the script file to generate the wav file
 
-print GENERATE "/home/pi/weather_station/media/WeatherStation_0.wav /home/pi/weather_station/current.wav silence 1 0.25 0.1% -1 0.25 0.1%\n";
+print GENERATE "/home/pi/weather_station/current.wav silence 1 0.25 0.1% -1 0.25 0.1%\n";
 close(WEATHER);
 close(GENERATE);
 
