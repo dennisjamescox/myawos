@@ -11,12 +11,12 @@ print GENERATE "\#/bin/sh\n";
 print GENERATE "sox /home/pi/weather_station/media/WeatherStation_intro.wav ";
 
 
+$WTH_FLAG = 0;
 $linecounter = 0;
 
 # go thru each line of the weather.txt file and generate a script of media files
 while($line = <WEATHER>)
 {
-
     chop($line);
 
     # default arraycount can be overriden
@@ -63,7 +63,9 @@ while($line = <WEATHER>)
 	# doing altimeter
 	print GENERATE "/home/pi/weather_station/media/WeatherStation_altimeter.wav ";
 
+	$WTH_FLAG = 1;
 	generate_from_array($line);
+	$WTH_FLAG = 0;
 
     }
     # TEMP
@@ -111,52 +113,59 @@ sub generate_from_array
     @carray = split(//,$info);
 
 
-#    print "sub: $info @carry $arraycount\n";
-
     for($i=0;$i<$arraycount;$i++)
     {
-#	print "$carray[$i]\n";
-	if($carray[$i] == '0')
+#	print "$info : $i : $arraycount : @carray[$i]\n";
+
+	# for some wierd reason the first if hits any non number - clearly I'm doing something wrong
+	if(@carray[$i] == '0')
 	{
-	    print GENERATE "/home/pi/weather_station/media/WeatherStation_0.wav ";
+	    if($i == 2 && $WTH_FLAG == 1)
+	    {
+		print GENERATE "/home/pi/weather_station/media/WeatherStation_point.wav ";
+	    }
+	    else
+	    {
+		print GENERATE "/home/pi/weather_station/media/WeatherStation_0.wav ";
+	    }
 	}
-	elsif($carray[$i] == '1')
+	elsif(@carray[$i] == '1')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_1.wav ";
 	}
-	elsif($carray[$i] == '2')
+	elsif(@carray[$i] == '2')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_2.wav ";
 	}
-	elsif($carray[$i] == '3')
+	elsif(@carray[$i] == '3')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_3.wav ";
 	}
-	elsif($carray[$i] == '4')
+	elsif(@carray[$i] == '4')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_4.wav ";
 	}
-	elsif($carray[$i] == '5')
+	elsif(@carray[$i] == '5')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_5.wav ";
 	}
-	elsif($carray[$i] == '6')
+	elsif(@carray[$i] == '6')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_6.wav ";
 	}
-	elsif($carray[$i] == '7')
+	elsif(@carray[$i] == '7')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_7.wav ";
 	}
-	elsif($carray[$i] == '8')
+	elsif(@carray[$i] == '8')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_8.wav ";
 	}
-	elsif($carray[$i] == '9')
+	elsif(@carray[$i] == '9')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_9.wav ";
 	}
-	elsif($carray[$i] == '.')
+	elsif(@carray[$i] == 'Z')
 	{
 	    print GENERATE "/home/pi/weather_station/media/WeatherStation_point.wav ";
 	}
@@ -167,3 +176,4 @@ sub generate_from_array
 
     }
 }
+
