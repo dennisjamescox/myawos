@@ -10,8 +10,9 @@ import time
 weatherFile = open('/home/pi/weather_station/weather_station.log', 'a')
 
 
-WeatherMatchString = "Play Weathe"
-ErrorString =        "Weather Rep"
+ThreeClickMatchString = "3 Clicks"
+FiveClickMatchString  = "5 Clicks"
+SevenClickMatchString = "7 Clicks"
 
 last_time_played = 0
 
@@ -23,7 +24,7 @@ runaway_flag = 0
 
 while True:
     cc = str(ser.readline())
-    cc = cc[2:][:11]
+    cc = cc[2:][:8]
     # used to print out nice time
     current_time = datetime.datetime.now()
     print(current_time,cc, file = weatherFile)
@@ -33,11 +34,11 @@ while True:
     flush_counter += 1
 
 
-    if flush_counter > 25:
+    if flush_counter > 10:
         flush_counter = 0
         weatherFile.flush()
     
-    if(cc == WeatherMatchString):
+    if(cc == FiveClickMatchString):
         if(last_time_played == 0):
             last_time_played = compare_time
             print(current_time,"calling play_weather 0 time on last_time_played",file = weatherFile)
@@ -63,9 +64,12 @@ while True:
             print(current_time,"Possible runaway - delaying 90 seconds", file = weatherFile)
             weatherFile.flush()
             last_time_played = compare_time + 60
-             
-    elif(cc == ErrorString):
-        print(current_time,"Error with Weather Reporting", file = weatherFile)
+
+    elif(cc == ThreeClickMatchString):
+        print(current_time,"3 click match",file = weatherFile)
+        weatherFile.flush()
+    elif(cc == SevenClickMatchString):
+        print(current_time,"7 click match",file = weatherFile)
         weatherFile.flush()
 
 weatherFile.close()        
