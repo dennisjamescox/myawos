@@ -8,7 +8,7 @@ Google doc (probably out of date) - https://docs.google.com/document/d/1_eoEnQV1
 There are multiple versions of the code - the baseline is tagged baseline07. If you grab that its a basic working set of the code. 
 Johann has made some massive improvements - removing the Arduino, using a optrelay, multiple clicker usage, computer generated voice, etc. 
 
-Its best if you get a basic version up first then start modifying with all the different variants aviable. 
+Its best if you get a basic version up first then start modifying with all the different variants aviable. Here is a baseline version https://www.dropbox.com/s/mq76vtjqxfsiegp/weather_station.tar.gz?dl=0
 
 First step - get yourself a Raspberry Pi 4, Ardunio Uno, Davis Weather Station or Ecowitt (not nearly as good as the Davis IMHO) and an aviation radio.
 The wiring is quite simple - just contact me if you need help.
