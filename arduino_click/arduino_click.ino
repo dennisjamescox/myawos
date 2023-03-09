@@ -4,16 +4,6 @@
  * dennisjcox@gmail.com
  */
 
-/* CAUTION: One or more of these values must be set */
-
-/* Set this value to 1 to allow for 3 click support */
-int THREECLICK = 0;
-
-/* Set this value to 1 to allow for 5 click support */
-int FIVECLICK = 1;
-
-/* Set this value to 1 to allow for 7 click support */
-int SEVENCLICK = 0;
 
 
 const int PTTSeconds = 5000;  // NOTE: Change this value to the maximum click count you want - so 7000 for 7 seconds 5000 for 5 seconds  3000 for 3 seconds
@@ -31,6 +21,7 @@ int PTTClickCount = 0; // Count # of clicks
 unsigned long boardTime = 0;
 unsigned long diffTime = 0;
 
+int catchFallingFlag = 0; // this is used to make sure it isn't just 1023 non stop
 int start = 0;
 
 void setup() {
@@ -45,7 +36,7 @@ void loop()
 
  if(start == 0)
   {
- //   Serial.println("Click listener process started");
+    Serial.println("Click listener process started");
     start = 1;
   }
   
@@ -53,42 +44,33 @@ void loop()
   // A0 goes to the Red wire
   A0Value = analogRead(A0);
 
-
-// Another way of reading... this one works on the 2nd board
-  if((A0Value > 666 && A0Value < 671) || (A0Value  == 1023))
+ // Serial.println(A0Value);
+  
+// Make sure its max press and that we aren't just holding the PTT
+  if(A0Value == 1023 && catchFallingFlag == 0)
   {
-//    Serial.println(A0Value); 
+ //   Serial.println(A0Value); 
     count++;
   }
   else
   {
+    // we got a non-1023 value so we can say the person let go of the PTT
+    catchFallingFlag = 0;
     count = 0;
   }
 
   // count is used to make sure the values held for at least 5 milliseconds
   if(count > 3)
   {
-     Serial.print("PTT Pressed ");
+     // Count each time we get a press
      PTTClickCount++;
+     catchFallingFlag = 1;
+     Serial.print("PTT Pressed ");
      Serial.println(PTTClickCount);
-     delay(40);
      count = 0;
   }
 
-  if(THREECLICK && PTTClickCount == 3)
-  {
-    ClickSuccessFlag = 3;
-  }
-  else if(FIVECLICK && PTTClickCount == 5)
-  {
-    ClickSuccessFlag = 5;
-  }
-  else if(SEVENCLICK && PTTClickCount == 7)
-  {
-    ClickSuccessFlag = 7;
-  }
-
-
+ 
   if(PTTClickCount == 1 && diffTimeFlag == 0)
   {
      diffTime = millis();
@@ -113,10 +95,9 @@ void loop()
         Serial.println(" .");
 */
 
-	if(ClickSuccessFlag > 1)
+	if(PTTClickCount == 5)
 	{
-	  Serial.print(ClickSuccessFlag);
-	  Serial.println(" Clicks");
+	  Serial.println("5 Clicks");
 	  delay(PlayBackDelay);
 	}
    
