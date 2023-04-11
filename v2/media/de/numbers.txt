@@ -1,0 +1,26 @@
+WSS_intro,Strassham Wetter
+WSS_localtime,Lokalzeit
+WSS_point,Komma
+WSS_decimal,Komma
+WSS_minus,minus
+WSS_0,null
+WSS_1,1
+WSS_2,zwo
+WSS_3,3
+WSS_4,4
+WSS_5,5
+WSS_6,6
+WSS_7,7
+WSS_8,8
+WSS_9,9
+WSS_degree,Grad
+WSS_at,mit
+WSS_knot,Knoten
+WSS_altimeter,QNH
+WSS_hpa,Hektopaskal
+WSS_temp,Temperatur
+WSS_celsius,Celsius
+WSS_dewpoint,Taupunkt
+WSS_frenheight,Fahrenheit
+WSS_wind,Wind
+WSS_zulu,Zulu

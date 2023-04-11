@@ -1,0 +1,14 @@
+Munich Airport Weather .
+1 2 3 3 Zulu .
+Wind
+1 2 3 degree .
+at
+1 o
+knots . 
+altimeter 2 9 9 2 .
+Temperature
+4 8 .
+Dewpoint
+4 zero .
+.  .  . you ordered two pizza salami an a Beer .
+happy landings

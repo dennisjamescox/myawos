@@ -1,0 +1,35 @@
+################################################################################
+#
+# Install 433MHz send and transmitter board
+#
+################################################################################
+
+# find details here:
+# https://pypi.org/project/rpi-rf/
+
+pip3 install rpi-rf
+
+use python scripts rpi-rf_receive for reading the handheld RC (GPIO12): rpi-rf_receive -g 12
+
+use python scripts rpi-rf_send (rpi-rf_receive for reading the handheld RC): rpi-rf_send -g 6
+
+
+find more info about 433rf here:
+--------------------------------
+https://domoticproject.com/controlling-433-mhz-remote-raspberry-pi/#Installing_rpi-rf
+https://www.instructables.com/RF-433-MHZ-Raspberry-Pi/
+
+
+
+######################################################################################
+# Shutdown/Startup via button on GPIO3
+dtoverlay=gpio-shutdown,gpio_pin=3, active_low=1,gpio_pull=up
+
+
+#mehr dazu bei
+https://raspberrypi.stackexchange.com/questions/117013/raspberry-pi-4-b-gpio-boot-and-shutdown-buttons
+https://raspberrypi.stackexchange.com/questions/117013/raspberry-pi-4-b-gpio-boot-and-shutdown-buttons
+
+https://bitreporter.de/raspberrypi/richtiger-an-ausschalter-fur-den-raspberry-pi/
+
+

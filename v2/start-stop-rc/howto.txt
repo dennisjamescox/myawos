@@ -1,0 +1,13 @@
+# zum 433-RF Empfaenger:
+https://www.instructables.com/RF-433-MHZ-Raspberry-Pi/
+
+# und
+# Shutdown/Startup per Taster an GPIO3. Since GPIO is used by I2C Bus, we have to use eg. GPIO19, but this is only working for shutdown
+dtoverlay=gpio-shutdown,gpio_pin=19, active_low=1,gpio_pull=up
+
+
+#mehr dazu bei
+https://raspberrypi.stackexchange.com/questions/117013/raspberry-pi-4-b-gpio-boot-and-shutdown-buttons
+https://raspberrypi.stackexchange.com/questions/117013/raspberry-pi-4-b-gpio-boot-and-shutdown-buttons
+
+https://bitreporter.de/raspberrypi/richtiger-an-ausschalter-fur-den-raspberry-pi/

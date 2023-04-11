@@ -1,0 +1,26 @@
+WSS_intro,Strassham Tempo
+WSS_localtime,Ora locale
+WSS_point,Virgola
+WSS_decimal,Virgola
+WSS_minus,meno
+WSS_0,zero
+WSS_1,1
+WSS_2,2
+WSS_3,3
+WSS_4,4
+WSS_5,5
+WSS_6,6
+WSS_7,7
+WSS_8,8
+WSS_9,9
+WSS_degree,Grado
+WSS_at,con
+WSS_knot,Nodo
+WSS_altimeter,QNH
+WSS_hpa,Hektopaskal
+WSS_temp,Temperatura
+WSS_celsius,Celsius
+WSS_dewpoint,Punto di rugiada
+WSS_frenheight,Fahrenheit
+WSS_wind,vento
+WSS_zulu,Zulu

@@ -1,0 +1,15 @@
+# Requirements for running the weather-station with Arduino Uno, connected to rPi by USB
+
+
+pip install gTTS
+pip install rpi-rf
+pip install pyserial
+#sudo apt-get install python3-gtts
+# install SOX and SOX Player
+sudo apt-get install sox
+sudo apt-get install libsox-fmt-mp3
+
+/boot/config.txt
+# shutdown/startup by button at GPIO3
+dtoverlay=gpio-shutdown,gpio_pin=3, active_low=1,gpio_pull=up
+

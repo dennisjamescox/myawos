@@ -1,0 +1,8 @@
+
+================================================================================
+20230409 20:04:53 rPi: starting Adafruit PTT-Listener
+  >>/home/pilot/weather_station/click_listen357.py<<
+  using Triggerlevel 10000 (=1.250V) with TRG-Adaption factor: 0.8;
+  RED-time: 5sec.; PTTseconds: 5sec.; HIT-Logging: True; Logweather: True;
+  use-MESSENGER: True; Source: ECOWITT; units: metric; lang: de
+--------------------------------------------------------------------------------

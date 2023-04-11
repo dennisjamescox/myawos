@@ -1,0 +1,62 @@
+#=====================================================================================
+# Setup SSD1306 OLED 128x64 px Display at Rapspberry Pi (by Johann Wiesheu, Jan 2023)
+# tested with Raspbian GNU/Linux 11 (bullseye)
+#=====================================================================================
+
+Connect the board with the rPi:
+ADS    rPi
+---------------
+VCC to 3.3 Volt 
+Gnd to Gnd
+SCL to SCL
+SDA to SDA
+
+Setup rPi
+=========
+
+# First check I2C Interface enabled
+# sudo raspi-config
+#  -> 3 Interface Options
+#     -> P5 I2C => enable = yes
+
+#
+# also possible by CLI:
+sudo raspi-config nonint do_i2c 0
+
+echo "I2C status (0 is good):"
+sudo raspi-config nonint get_i2c
+
+# Reboot the system
+sudo reboot now
+
+# install the needed tools
+sudo apt-get update
+sudo apt-get install -y i2c-tools
+sudo i2cdetect -y 1   # -> find display at addresss 0x3c
+
+sudo apt-get install python3-dev libffi-dev libssl-dev python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
+sudo apt-get install python3-rpi.gpio python3-pip -y
+sudo apt-get install git -y
+sudo -H pip3 install luma.oled
+
+sudo mkdir oled
+cd oled
+# luma.oled serves some examples:
+sudo git clone https://github.com/rm-hull/luma.examples
+cd luma.examples/examples/
+python3 demo.py
+
+# good luck!
+
+#alternatively:
+#https://www.raspberrypi-spy.co.uk/2018/04/i2c-oled-display-module-with-raspberry-pi/
+# which I couldn't get to run...
+
+# get the documentation of the board at:
+# German:  https://www.az-delivery.de/a/downloads/-/f4ed2121d1969531/0d73fe359cfc349e
+# English: https://www.az-delivery.de/a/downloads/-/3450e9766087b31a/9d892f02177da7b6  
+
+# Inter-process-communication, using queues:
+# https://stackoverflow.com/questions/36440533/interprocess-communication-between-independent-python3-scripts
+
+
