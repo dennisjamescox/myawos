@@ -1,5 +1,5 @@
 ###############################################################################
-# weather_to_speech.py 
+# wind_to_speech.py 
 # by Johann Wiesheu
 # Mar. 2023 
 # Transcoding raw weather data (digits) to speech using local speech directory
