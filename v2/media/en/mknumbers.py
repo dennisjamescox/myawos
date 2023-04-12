@@ -18,7 +18,7 @@ while True:
     in_line = in_line[:-1]
     file, sniplet = in_line.split(",")
     print("Line:", file, sniplet)
-    awos=HOME + "/weather_station/media/en_us/" + file + ".mp3"
+    awos=HOME + "/weather_station/media/" + lang + "/" + file + ".mp3"
     print("generiere ", awos)
     audio=gTTS(sniplet, lang=lang, tld="us")
     audio.save(awos)
