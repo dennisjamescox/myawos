@@ -1,5 +1,5 @@
 #===============================================================================
-# 01_README_rPi_ADS1115_SSD1306.txt    Version 0.9            10 Mar. 2023
+# 01_README_rPi_ADS1115_SSD1306.txt    Version 0.9            10 Apr. 2023
 #
 # Setup Weather-Station on Raspberry Pi 4,  Raspian 11 (bullseye)
 # native click-listener on rPi using interface-bards:
@@ -112,7 +112,7 @@
 2.2.3 weather_to_speech.pl (within ~/weather_station/weather) produces the audio output 
       weather.mp3. There are several language libraries available. 
       The CLI option "-lang <language>" has to be used.
-      Currentliy available languages are en_us, en_uk, it and de.
+      Currentliy available languages are en, uk, it and de.
       There is also a module wind_to_speech.py, which strips down the output
       to wind information only.
 
@@ -195,13 +195,13 @@ usage: click_listen357.py [-h] [-triggerlevel TRIGGERLEVEL]
                           [-triggeradaption TRIGGERADAPTION] [-loghit] [-logweather]
                           [-trafficlight TRAFFICLIGHT] [-PTTseconds PTTSECONDS] [-message]
                           -source {WLL,ECOWITT} -unit {imperial,metric} -lang
-                          {en_us,en_gb,de,it}
+                          {en,uk,de,it}
 
 optional arguments:
   -h, --help            show this help message and exit
   -triggerlevel TRIGGERLEVEL
                         Optional: Triggerlevel at which a Speaker Signal should be
-                        interpreted as a Click - assume 15000 should be a good starting
+                        interpreted as a Click - assume 10000 should be a good starting
                         value; 15000 (1.88 V) is default.
   -triggeradaption TRIGGERADAPTION
                         Optional: allows adapiton of TRIGGERLEVEL by factor. eg. 0.6 / "1.0".
@@ -221,9 +221,9 @@ optional arguments:
                         "ECOWITT".
   -unit {imperial,metric}
                         Required: Imperial or Metric units.
-  -lang {en_us,en_gb,de,it}
-                        Required: Language for transcoding Weather Options are "en_us",
-                        "en_gb", "de" and "it".
+  -lang {en,uk,de,it}
+                        Required: Language for transcoding Weather Options are "en",
+                        "uk", "de" and "it".
 
   
 
