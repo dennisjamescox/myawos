@@ -4,7 +4,5 @@ An edge detection improves the selectivity of the individual clicks. Another adv
 The messaging module sends information and messages to an optional OLED display or to an email recipient. Different LEDs inform about the current status. 
 In my setup, a 433 MHz transmitter (and receiver) control a traffic light/flashlight (via radio-controlled switching socket) that warns residents when using a dirt road at the site during flight operations.
 The PTT button of the radio is not operated by a mechanical relay, but by a Solid State Relay (AQY211EH), which can no longer jam.
-
-
-
-
+This directory (v2) contains the sources for the ADS1115 and rPi based AWOS system. For a better overview, the individual modules are stored in different subfolders, starting in the working directory "weather_station".
+Extensive documentation and HowTo's are stored in the directory Docu.
