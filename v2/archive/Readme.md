@@ -1,0 +1,2 @@
+This path contains another unreleased version of MyAWOS(1.0) with some improvements by Johann. 
+E.g. passing the trigger level over the serial (USB) interface from the rPi to the Arduino or a RTS/CTS signaling, which tells the Arduino when to read signals (instead of sleep statements).
