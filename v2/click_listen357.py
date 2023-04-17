@@ -12,6 +12,9 @@
 #
 ##############################################################################
 # CHANGELOG
+# Version 0.91 17/Apr/2023
+# using optimized ecowitt_getweather.py and weather_to_speech.py modules
+#
 # Version 0.90 29/Mar/2023
 # reworked transcoding of ecowitt weather, now using local dictionary of speech
 # sniplets, which can also be used for transcoding WLL or other weather.
@@ -467,7 +470,7 @@ def fiveclicks(logweather, SOURCE):
 
       if SOURCE == "ECOWITT":     # else (WLL), weather file is already prepared by cronjob
          os.system(f'python {Prog_Path}/weather/ecowitt/ecowitt_getweather.py -unit {unit}')
-         os.system(f'python {Prog_Path}/weather/wind_to_speech.py -lang {lang}')
+         os.system(f'python {Prog_Path}/weather/weather_to_speech.py -lang {lang} -windonly')
       enablePTT()                    # now included in this module
       os.system('play -q -v 1.2 {}/ramdisk/weather.mp3 tempo 1.8 >/dev/null 2>&1'.format(Prog_Path))
       disablePTT()                   # now included in this module

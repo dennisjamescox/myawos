@@ -1,9 +1,10 @@
 ################################################################################
 # ecowitt_getweather.py   ecowitt api  
 # by Dennis Cox and Johann Wiesheu, Dec. 2022 
-# December 22 2022
+# April 17 2023
 # pull current weather from local Ecowitt weather station by API
-# output is weather.txt, units imperial or metric, depending on the CMD-line args.
+# output is weather.txt, units imperial or metric, depending on CMD-line args:
+# imperial|metric
 # time in zulu
 # wind in degrees
 # wind speed in knots
@@ -11,26 +12,21 @@
 # temp in Fahrenheit or (°C)
 # dewpoint in Fahrenheit or (°C)
 ################################################################################
+# CHANGELOG
+# Version 0.2 17 Apr. 2023
+# moved code to function so it can be imported and called by other modules
+################################################################################
+import argparse
+import time
+import datetime
+import json
+import requests
+import os
 
-
-def main():
-   import argparse
-   import time
-   import datetime
-   import json
-   import requests
-   from gtts import gTTS
-   import os
+def pull_weather(unit):
    
    HOME=os.environ['HOME']
    api_key_file = HOME + "/.weather_station_authentication/API_data.txt"
-
-   
-   # CMD line arguments
-   p=argparse.ArgumentParser()
-   p.add_argument('-unit', required=True, choices=['imperial', 'metric'], help='Required: Imperial or Metric units.')
-   args = p.parse_args()
-   unit = args.unit
 
    # USE ACTUAL API
    # doc.ecowitt.net/web/
@@ -129,6 +125,15 @@ def main():
    # convert to mp3
    awos=HOME + "/weather_station/ramdisk/weather.mp3"
 
+def main():
+   
+   # CMD line arguments
+   p=argparse.ArgumentParser()
+   p.add_argument('-unit', required=True, choices=['imperial', 'metric'], help='Required: Imperial or Metric units.')
+   args = p.parse_args()
+   unit = args.unit
+
+   pull_weather(unit)
 
 if __name__ == "__main__":
     main()
