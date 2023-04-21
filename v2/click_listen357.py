@@ -8,7 +8,7 @@
 # 3/5/7 clicks are recognized - the corresponding actions are executed
 #
 # Source by Dennis Cox / dennisjcox@gmail.com / 2022
-# and Johann Wiesheu / av.wiesheu@bayern-mail.de / Feb. 2023
+# and Johann Wiesheu / info@myawos.de / Feb. 2023
 #
 ##############################################################################
 # CHANGELOG
