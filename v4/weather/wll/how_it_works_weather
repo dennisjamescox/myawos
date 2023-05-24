@@ -1,0 +1,24 @@
+weather.py generates weather.txt
+convert_text.pl generates generate.sh
+generate.sh produces weather.wav
+weather.wav is the AWOS
+
+There is a crontab file that runs every 10 minutes to generate the weather
+The audio board on the pi has three inputs - the input closest to the usb is microphone
+The farest input is headphones
+
+
+The audio board is wonkly use
+sudo alsactl --file audio_preset_external_jack_microphone_input2 restore
+
+then make sure mixer has the volume up
+sudo alsamixer
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,26 @@
+
+
+sudo raspi-config -> enable I2C
+sudo apt-get update
+sudo apt-get install -y i2c-tools
+sudo i2cdetect -y 1   # -> find display at addresss 0x3c
+sudo apt-get install python3-dev libffi-dev libssl-dev python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
+sudo apt-get install python3-rpi.gpio python3-pip -y
+sudo apt-get install git -y
+
+sudo -H pip3 install luma.oled
+sudo mkdir oled
+cd oled
+luma.oled bietet viele Beispiele und diese können wir uns mit folgendem 
+sudo git clone https://github.com/rm-hull/luma.examples
+cd luma.examples/examples/
+python3 demo.py
+
+alternatively:
+https://www.raspberrypi-spy.co.uk/2018/04/i2c-oled-display-module-with-raspberry-pi/
+but couldnt get it to run...
+
+Inter-process-communication, using queues:
+https://stackoverflow.com/questions/36440533/interprocess-communication-between-independent-python3-scripts
+
+

@@ -1,0 +1,14 @@
+[Unit]
+Description=Weather Station autostart
+After=graphical.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pilot
+WorkingDirectory=/home/pilot/weather_station
+ExecStart=/home/pilot/weather_station/tools/start_weather_station.sh
+
+[Install]
+WantedBy=multi-user.target
