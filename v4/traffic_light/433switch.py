@@ -14,7 +14,7 @@ def main():
 
    if len(sys.argv) != 2:
       #has to be string for later string-compare:
-      rotphase = 180
+      rotphase = 200
 #      print("rPi: no CMD-Line agruemnt found -> 433switch now using default red period of 180 sec. ")
    else:
       rotphase = int((sys.argv[1]))
