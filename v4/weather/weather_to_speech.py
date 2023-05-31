@@ -6,11 +6,14 @@
 # Sources of Speach: ~/weather_station/media/<lang>/WSS_<enty>.mp3
 ################################################################################
 # CHANGELOG
+# Version 0.3 31 May. 2023
+# add error-handling if API call timed out
+#
 # Version 0.2 17 Apr. 2023
 # moved code to function so it can be imported and called by other modules
 # solved Problem with exec statement (see below)
 # added CMD-line argument "windonly" to call it for transcoding complete 
-# weather or wind only (wind_to_speech.py is now obsolete)
+# weather or wind only
 ###############################################################################
 
 import argparse
@@ -74,6 +77,7 @@ def transcode(lang,scope):
 #  17.4.2023: problem solved! pass globals to exec -> https://stackoverflow.com/questions/41100196/exec-not-working-inside-function-python3-x
    
    for file in glob.glob(speechfiles):
+#      varname = "sniplet_" + str(file)[38:-4]   # clip filepath up to "_" and ".mp3"  # path for user pi is 3 bytes shorter
       varname = "sniplet_" + str(file)[41:-4]   # clip filepath up to "_" and ".mp3"
 #      print("speechfiles: ", file)
 #      print("snipletname=", varname)
@@ -97,8 +101,15 @@ def transcode(lang,scope):
    #      print("line=", lineno, line.strip())
          if (line.strip() == "imperial"):
             unit = "imperial"
-         else:
+         elif (line.strip() == "metric"):
             unit = "metric"
+         else:
+            unit = "error"
+            awos.write(sniplet_noweather)
+            f.close()
+            awos.close()
+            return
+
       
       if lineno == 2 and scope == "complete":            # Line 2: intro + time
          awos.write(sniplet_intro)

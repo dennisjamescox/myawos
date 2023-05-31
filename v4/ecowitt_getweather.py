@@ -13,6 +13,9 @@
 # dewpoint in Fahrenheit or (°C)
 ################################################################################
 # CHANGELOG
+# Version 0.3 31 May 2023
+# add timeout for API request - seldom ecowitt does not answer -> program stuck
+#
 # Version 0.2 17 Apr. 2023
 # moved code to function so it can be imported and called by other modules
 ################################################################################
@@ -40,12 +43,22 @@ def pull_weather(unit):
    api_key = buf[1]
    mac = buf[2]
    apifile.close()
+   weatherfile = HOME+"/weather_station/ramdisk/weather.txt"
+   weather = open(weatherfile, 'w')
+
 
    url = "https://api.ecowitt.net/api/v3/device/real_time?" + application_key.strip() + "&" + api_key.strip() + "&" + mac.strip() + "&call_back=all"
 
 #   print("URL:",url)
 
-   r = requests.get(url)
+   try:
+      r = requests.get(url, timeout=(10, 30))
+   except Exception as e:
+#      print("type=", type(e))
+#      print("E=", e)
+      print("ERROR", file = weather)
+      weather.close()
+      quit()
    
    # Uncomment for debugging
    #print("raw data from ecowitt")
@@ -69,10 +82,6 @@ def pull_weather(unit):
    hours = zulutime.strftime("%H")
    minutes = zulutime.strftime("%M")
    
-   weatherfile = HOME+"/weather_station/ramdisk/weather.txt"
-
-   weather = open(weatherfile, 'w')
-
 
    if unit == "metric":
       print("metric", file = weather)
@@ -122,8 +131,8 @@ def pull_weather(unit):
    
    weather.close()
    
-   # convert to mp3
-   awos=HOME + "/weather_station/ramdisk/weather.mp3"
+#   # convert to mp3
+#   awos=HOME + "/weather_station/ramdisk/weather.mp3"
 
 def main():
    

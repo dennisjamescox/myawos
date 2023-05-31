@@ -24,3 +24,4 @@ WSS_dewpoint,Taupunkt
 WSS_frenheight,Fahrenheit
 WSS_wind,Wind
 WSS_zulu,Zulu
+WSS_noweather, . heute kein Wetter verfügbar
