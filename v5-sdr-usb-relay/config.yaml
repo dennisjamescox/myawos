@@ -1,0 +1,38 @@
+# MyAWOS SDR Configuration
+
+radio:
+  frequency_mhz: "122.700000"
+  required_clicks: 5
+  click_window_seconds: 4.0
+  cooldown_seconds: 30
+
+sdr:
+  device: "airspy"
+  sample_rate: "2500000"
+  threshold_on: 2200
+  threshold_off: 1400
+  min_click_gap_seconds: 0.20
+  min_quiet_time_seconds: 0.12
+
+audio:
+  file: "/home/weather/current.wav"
+  timeout_seconds: 45
+  max_tx_seconds: 50
+
+ptt:
+  method: "scripts"
+
+  # Used only when method = scripts
+  enable_script: "/home/weather/enablePTT.py"
+  disable_script: "/home/weather/disablePTT.py"
+
+  # Used only when method = usb_relay
+  port: "auto"
+  baud: 9600
+  on_command_hex: "A0 01 01 A2"
+  off_command_hex: "A0 01 00 A1"
+
+logging:
+  directory: "/home/weather/"
+  filename_prefix: "sdr_click"
+
