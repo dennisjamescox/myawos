@@ -2,12 +2,17 @@
 use strict;
 use warnings;
 use autodie;
+use JSON::PP qw(decode_json);
+use File::Basename qw(dirname);
+use File::Temp qw(tempfile);
 
-my $BASE      = "/home/user/weather_station";
+my $BASE      = $ENV{MYAWOS_BASE} // "/home/user/weather_station";
 my $WEATHER_TXT = "$BASE/weather.txt";
 my $GEN_SH    = "$BASE/generate.sh";
 my $MEDIA     = "$BASE/media";
 my $OUT_WAV   = "$BASE/current.wav";
+my $CLOUDS_JSON = "$BASE/clouds.json";
+my $TEMP_WAV = "$BASE/.current.tmp.wav";
 
 # Audio output params
 my $SOX_BITS   = 8;
@@ -49,6 +54,21 @@ my %CLIP = (
   hours    => "$MEDIA/WeatherStation_hours.wav",
   old      => "$MEDIA/WeatherStation_old.wav",
 
+  awc_estimated      => "$MEDIA/WeatherStation_awc_estimated.wav",
+  clouds             => "$MEDIA/WeatherStation_clouds.wav",
+  clear              => "$MEDIA/WeatherStation_clear.wav",
+  few                => "$MEDIA/WeatherStation_few.wav",
+  scattered          => "$MEDIA/WeatherStation_scattered.wav",
+  broken             => "$MEDIA/WeatherStation_broken.wav",
+  overcast           => "$MEDIA/WeatherStation_overcast.wav",
+  vertical_visibility => "$MEDIA/WeatherStation_vertical_visibility.wav",
+  feet               => "$MEDIA/WeatherStation_feet.wav",
+  msl                => "$MEDIA/WeatherStation_msl.wav",
+  tops               => "$MEDIA/WeatherStation_tops.wav",
+  cirrus             => "$MEDIA/WeatherStation_cirrus.wav",
+  above              => "$MEDIA/WeatherStation_above.wav",
+  flight_level       => "$MEDIA/WeatherStation_flight_level.wav",
+
     
     );
 
@@ -59,7 +79,7 @@ for my $clip (values %CLIP) {
 
 
 open my $weather_fh, "<", $WEATHER_TXT;
-open my $gen_fh,     ">", $GEN_SH;
+my ($gen_fh, $temp_script) = tempfile(".generate.XXXXXX", DIR => dirname($GEN_SH), UNLINK => 0);
 
 print {$gen_fh} "#!/bin/sh\n";
 print {$gen_fh} "sox $CLIP{intro} ";
@@ -136,12 +156,16 @@ while (my $line = <$weather_fh>) {
   $linecounter++;
 }
 
+emit_cloud_audio($gen_fh, $CLOUDS_JSON);
+
 # Finish sox command
-print {$gen_fh} "-b $SOX_BITS -c $SOX_CHANS -r $SOX_RATE $OUT_WAV ";
-print {$gen_fh} "silence 1 0.17 0.1% -1 0.17 0.1%\n";
+print {$gen_fh} "-b $SOX_BITS -c $SOX_CHANS $TEMP_WAV ";
+print {$gen_fh} "gain -3 rate -v $SOX_RATE silence 1 0.17 0.1% -1 0.17 0.1% ";
+print {$gen_fh} "&& mv -f $TEMP_WAV $OUT_WAV\n";
 
 close $weather_fh;
 close $gen_fh;
+rename $temp_script, $GEN_SH;
 
 # Make script executable (optional but handy)
 chmod 0755, $GEN_SH;
@@ -167,6 +191,54 @@ sub emit_from_string {
 sub require_clip {
   my ($path) = @_;
   die "Missing audio clip: $path\n" unless -f $path;
+}
+
+sub emit_cloud_audio {
+  my ($fh, $path) = @_;
+  return unless -f $path;
+  open my $cloud_fh, "<", $path;
+  local $/;
+  my $raw = <$cloud_fh>;
+  close $cloud_fh;
+  my $data = eval { decode_json($raw) };
+  return unless ref($data) eq "HASH";
+  return unless ($data->{text} // "") ne "";
+  return unless ref($data->{layers}) eq "ARRAY" && @{$data->{layers}};
+
+  print {$fh} "$CLIP{awc_estimated} $CLIP{clouds} ";
+  for my $layer (@{$data->{layers}}) {
+    next unless ref($layer) eq "HASH";
+    my $kind = $layer->{kind} // "";
+    if ($kind eq "layer") {
+      my %coverage_clip = (
+        SKC => $CLIP{clear}, CLR => $CLIP{clear},
+        SCT => $CLIP{scattered}, BKN => $CLIP{broken}, OVC => $CLIP{overcast},
+        VV => $CLIP{vertical_visibility},
+      );
+      my $clip = $coverage_clip{$layer->{code} // ""};
+      print {$fh} "$clip " if $clip;
+      if (($layer->{code} // "") eq "FEW") {
+        print {$fh} "$CLIP{few} $CLIP{clouds} ";
+      }
+      if (defined $layer->{base_msl_ft}) {
+        print {$fh} "$CLIP{at} ";
+        emit_from_string($fh, "$layer->{base_msl_ft}");
+        print {$fh} "$CLIP{feet} $CLIP{msl} ";
+      }
+    }
+    elsif ($kind eq "top" && defined $layer->{top_msl_ft}) {
+      print {$fh} "$CLIP{tops} $CLIP{at} ";
+      emit_from_string($fh, "$layer->{top_msl_ft}");
+      print {$fh} "$CLIP{feet} $CLIP{msl} ";
+    }
+    elsif ($kind eq "cirrus") {
+      print {$fh} "$CLIP{cirrus} $CLIP{clouds} ";
+      if ($layer->{above_fl180}) {
+        print {$fh} "$CLIP{above} $CLIP{flight_level} ";
+        emit_from_string($fh, "180");
+      }
+    }
+  }
 }
 
 sub weather_file_age_hours {

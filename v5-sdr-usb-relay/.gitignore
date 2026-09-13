@@ -1,0 +1,11 @@
+clouds.json
+.clouds.lock
+.weather_loop.lock
+.current.tmp.wav
+.generate.*
+current.wav
+current.mp3
+current_sms.txt
+rwj_awos.png
+__pycache__/
+*.pyc

@@ -7,24 +7,41 @@ radio:
   cooldown_seconds: 30
 
 sdr:
-  device: "airspy"
-  sample_rate: "2500000"
-  threshold_on: 2200
-  threshold_off: 1400
+  device: "hackrf"
+  serial: "0000000000000000977c64de2d3b4d13"
+  sample_rate: 8000000
+  tune_offset_hz: 100000
+  channel_rate_hz: 20000
+  amp_enable: false
+  lna_gain_db: 16
+  vga_gain_db: 16
+  baseband_filter_hz: 1750000
+  threshold_mode: "relative"
+  threshold_on_db_above_noise: 10
+  threshold_off_db_above_noise: 6
+  calibration_seconds: 2
   min_click_gap_seconds: 0.20
   min_quiet_time_seconds: 0.12
 
 audio:
-  file: "/home/weather/current.wav"
+  file: "/home/user/weather_station/current.wav"
   timeout_seconds: 45
   max_tx_seconds: 50
+
+transmission:
+  method: "hackrf"
+  script: "/home/user/weather_station/hackrf_transmit_once.py"
+  sample_rate: 2000000
+  tx_gain_db: 0
+  modulation_index: 0.75
+  carrier_scale: 0.5
 
 ptt:
   method: "scripts"
 
   # Used only when method = scripts
-  enable_script: "/home/weather/enablePTT.py"
-  disable_script: "/home/weather/disablePTT.py"
+  enable_script: "/home/user/weather_station/enablePTT.py"
+  disable_script: "/home/user/weather_station/disablePTT.py"
 
   # Used only when method = usb_relay
   port: "auto"
@@ -33,6 +50,11 @@ ptt:
   off_command_hex: "A0 01 00 A1"
 
 logging:
-  directory: "/home/weather/"
+  directory: "/home/user/weather_station/"
   filename_prefix: "sdr_click"
 
+safety:
+  # Source defaults are safe. Enable both gates only in a deployment whose RF
+  # port remains connected to a dummy load, attenuated path, or shielded enclosure.
+  transmit_enabled: false
+  contained_rf_confirmed: false
