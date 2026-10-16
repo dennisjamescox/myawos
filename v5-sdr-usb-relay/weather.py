@@ -1,201 +1,210 @@
+#!/usr/bin/env python3
+"""Read WeatherLink Live locally without requiring a discovery library."""
+
+from __future__ import annotations
+
+import argparse
 import json
+import os
+import tempfile
 import urllib.request
-from datetime import datetime, timezone
-import weatherlink_live_local as wlll
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
 
-# Updated dcox 6/06/2026
-# Changes:
-#  new error file to store so it doesn't overwrite weather
-#  altimeter now provides two digit on float
+import yaml
 
+try:  # Optional convenience only; a configured/cached host is preferred.
+    import weatherlink_live_local as wlll
+except ImportError:
+    wlll = None
 
-
-WEATHER_TXT_PATH = "/home/user/weather_station/weather.txt"
-ERROR_PATH = "/home/user/weather_station/weather_error.txt"
-STATE_PATH = "/home/user/weather_station/weatherlink_state.json"  # stores ip + last_wind_dir
-PORT = 80
-JSON_TIMEOUT_SEC = 2.0
 
 MPH_TO_KT = 0.868976
-CALM_KT_THRESHOLD = 1.0  # below this, hold last direction
-DIR_ROUND_DEG = 10       # round down to nearest 10 degrees
+CALM_KT_THRESHOLD = 1.0
+DIR_ROUND_DEG = 10
 
 
-def write_error(msg: str) -> None:
+def load_config(path: Path) -> dict[str, Any]:
+    with path.open("r", encoding="utf-8") as handle:
+        config = yaml.safe_load(handle)
+    if not isinstance(config, dict):
+        raise ValueError(f"Invalid configuration: {path}")
+    return config
+
+
+def write_error(path: Path, message: str) -> None:
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
-    with open(ERROR_PATH,"w") as f:
-        print(f"{timestamp} {msg}", file=f)
-        
-def load_state(path: str) -> dict:
-    try:
-        with open(path, "r") as f:
-            st = json.load(f)
-            return st if isinstance(st, dict) else {}
-    except FileNotFoundError:
-        return {}
-    except Exception:
-        return {}
+    path.write_text(f"{timestamp} {message}\n", encoding="utf-8")
 
-def save_state(path: str, state: dict) -> None:
-    try:
-        with open(path, "w") as f:
-            json.dump(state, f)
-    except Exception:
-        pass  # don't fail run if state can't be written
 
-def discover_ip_via_wlll():
+def load_state(path: Path) -> dict[str, Any]:
+    try:
+        state = json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+    return state if isinstance(state, dict) else {}
+
+
+def save_state(path: Path, state: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def discover_ip_via_wlll() -> str | None:
+    if wlll is None:
+        return None
     try:
         devices = wlll.discover()
-        if not devices:
-            return None
-        return devices[0].ip_addresses[0]
+        return str(devices[0].ip_addresses[0]) if devices else None
     except Exception:
         return None
 
-def http_get_current_conditions(ip: str) -> dict:
-    url = f"http://{ip}:{PORT}/v1/current_conditions"
-    req = urllib.request.Request(
-        url=url,
-        method="GET",
-        headers={"Accept": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=JSON_TIMEOUT_SEC) as resp:
-        if resp.status != 200:
-            raise RuntimeError(f"HTTP {resp.status}")
-        raw = resp.read().decode("utf-8", errors="replace")
-    return json.loads(raw)
 
-def find_record(conditions: list, data_structure_type: int, txid: int | None = None) -> dict | None:
-    for rec in conditions:
-        if not isinstance(rec, dict):
+def http_get_current_conditions(host: str, port: int, timeout: float) -> dict[str, Any]:
+    request = urllib.request.Request(
+        f"http://{host}:{port}/v1/current_conditions",
+        headers={"Accept": "application/json", "User-Agent": "MyAWOS/5"},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        if response.status != 200:
+            raise RuntimeError(f"Weather station returned HTTP {response.status}")
+        return json.loads(response.read().decode("utf-8", errors="replace"))
+
+
+def find_record(conditions: list[Any], data_structure_type: int, txid: int | None = None) -> dict[str, Any] | None:
+    for record in conditions:
+        if not isinstance(record, dict) or record.get("data_structure_type") != data_structure_type:
             continue
-        if rec.get("data_structure_type") != data_structure_type:
+        if txid is not None and record.get("txid") != txid:
             continue
-        if txid is not None and rec.get("txid") != txid:
-            continue
-        return rec
+        return record
     return None
 
-def f_to_c(f: float) -> float:
-    return (f - 32.0) * (5.0 / 9.0)
 
-def normalize_dir_deg(deg: float) -> int:
-    """
-    Normalize to 0..359, then round DOWN to nearest DIR_ROUND_DEG.
-    Ensures 360 never appears (becomes 000).
-    """
-    # normalize
-    d = int(deg) % 360
-    # round down
-    d = (d // DIR_ROUND_DEG) * DIR_ROUND_DEG
-    # re-normalize just in case
-    d = d % 360
-    return d
+def normalize_dir_deg(value: float) -> int:
+    return ((int(value) % 360) // DIR_ROUND_DEG * DIR_ROUND_DEG) % 360
 
-def main() -> None:
-    state = load_state(STATE_PATH)
-    ip = state.get("ip")
 
-    # If no cached IP, discover now
-    if not ip:
-        ip = discover_ip_via_wlll()
-        if not ip:
-            write_error("Error getting weather from station")
-            return
-        state["ip"] = ip
-        save_state(STATE_PATH, state)
-
-    # JSON-first attempt
-    payload = None
-    try:
-        payload = http_get_current_conditions(ip)
-    except Exception:
-        payload = None
-
-    # If JSON failed, discover IP via original API, update state, retry once
-    if payload is None:
-        new_ip = discover_ip_via_wlll()
-        if new_ip:
-            ip = new_ip
-            state["ip"] = ip
-            save_state(STATE_PATH, state)
-            try:
-                payload = http_get_current_conditions(ip)
-            except Exception:
-                payload = None
-
-    if payload is None:
-        write_error("Error getting weather from station")
-        return
-
+def observation_values(
+    payload: dict[str, Any], state: dict[str, Any], now: datetime | None = None
+) -> tuple[list[str], datetime]:
+    current_time = now or datetime.now(timezone.utc)
     data = payload.get("data") or {}
     conditions = data.get("conditions") or []
     if not isinstance(conditions, list) or not conditions:
-        write_error("Error getting weather from station")
-        return
+        raise ValueError("response contained no conditions")
 
-    # Your JSON:
-    # - data_structure_type 1 with txid:1 for outdoor suite
-    # - data_structure_type 3 for barometer
-    iss = find_record(conditions, 1, txid=1) or find_record(conditions, 1)
-    bar = find_record(conditions, 3)
+    outdoor = find_record(conditions, 1, txid=1) or find_record(conditions, 1)
+    barometer = find_record(conditions, 3)
+    if not outdoor or not barometer:
+        raise ValueError("required sensor records are missing")
 
-    if not iss or not bar:
-        write_error("Error getting weather from station")
-        return
-
-    # ---- Time ----
-    zulutime = datetime.now(timezone.utc)
-    hours_minutes = zulutime.strftime("%H%M")
-
-    # ---- Wind (1-minute avg) ----
     try:
-        wind_dir_1min = float(iss.get("wind_dir_scalar_avg_last_1_min"))
-        wind_mph_1min = float(iss.get("wind_speed_avg_last_1_min"))
-        gust_mph_2 = float(iss.get("wind_speed_hi_last_2_min"))
-    except Exception:
-        write_error("Error getting weather from station")
-        return
+        observed_at = datetime.fromtimestamp(float(data["ts"]), timezone.utc)
+    except (KeyError, TypeError, ValueError, OSError) as error:
+        raise ValueError("station observation timestamp is missing or invalid") from error
+    if observed_at > current_time + timedelta(minutes=5):
+        raise ValueError("station observation timestamp is in the future")
 
-    wind_kt_1min = wind_mph_1min * MPH_TO_KT
-    gust_kt_2 = gust_mph_2 * MPH_TO_KT
+    try:
+        wind_direction = float(outdoor["wind_dir_scalar_avg_last_1_min"])
+        wind_speed_kt = float(outdoor["wind_speed_avg_last_1_min"]) * MPH_TO_KT
+        wind_gust_kt = float(outdoor["wind_speed_hi_last_2_min"]) * MPH_TO_KT
+        altimeter = float(barometer["bar_sea_level"])
+        temperature_c = round((float(outdoor["temp"]) - 32.0) * 5.0 / 9.0)
+        dewpoint_c = round((float(outdoor["dew_point"]) - 32.0) * 5.0 / 9.0)
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError("station weather values are missing or invalid") from error
 
-    # Direction handling:
-    # - If calm (< 1 kt), keep last non-calm direction (from state) if available
-    # - Else compute rounded direction and store it
-    last_dir = state.get("last_wind_dir")  # expected int 0..359
-    if wind_kt_1min < CALM_KT_THRESHOLD and isinstance(last_dir, int):
-        dir_out = last_dir
+    last_direction = state.get("last_wind_dir")
+    if wind_speed_kt < CALM_KT_THRESHOLD and isinstance(last_direction, int):
+        direction = last_direction
     else:
-        dir_out = normalize_dir_deg(wind_dir_1min)
-        state["last_wind_dir"] = dir_out
-        save_state(STATE_PATH, state)
+        direction = normalize_dir_deg(wind_direction)
+        state["last_wind_dir"] = direction
 
-    # ---- Pressure / altimeter (inHg, already sea-level) ----
+    values = [
+        observed_at.strftime("%H%M"),
+        f"{direction:03d}",
+        str(round(wind_speed_kt)),
+        str(round(wind_gust_kt)),
+        f"{altimeter:.2f}",
+        str(temperature_c),
+        str(dewpoint_c),
+    ]
+    return values, observed_at
+
+
+def write_weather(path: Path, values: list[str], observed_at: datetime) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(prefix=".weather.", dir=path.parent, text=True)
     try:
-        altimeter = round(float(bar.get("bar_sea_level")), 2)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as weather_file:
+            weather_file.write("\n".join(values) + "\n")
+        os.replace(temporary_name, path)
+        timestamp = observed_at.timestamp()
+        os.utime(path, (timestamp, timestamp))
     except Exception:
-        write_error("Error getting weather from station")
-        return
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        raise
 
-    # ---- Temp / Dewpoint ----
-    # JSON is °F -> convert to °C to match your original output style
+
+def refresh(config: dict[str, Any], base: Path) -> int:
+    settings = config.get("weather", {})
+    state_path = base / "weatherlink_state.json"
+    error_path = base / "weather_error.txt"
+    weather_path = base / "weather.txt"
+    state = load_state(state_path)
+    configured_host = str(os.environ.get("MYAWOS_WEATHERLINK_HOST", settings.get("host", ""))).strip()
+    host = configured_host or str(state.get("ip", "")).strip() or discover_ip_via_wlll()
+    if not host:
+        write_error(error_path, "Weather unavailable: configure weather.host or MYAWOS_WEATHERLINK_HOST")
+        return 1
+
+    state["ip"] = host
     try:
-        temp_c = round(f_to_c(float(iss.get("temp"))))
-        dew_c = round(f_to_c(float(iss.get("dew_point"))))
-    except Exception:
-        write_error("Error getting weather from station")
-        return
+        payload = http_get_current_conditions(
+            host,
+            int(settings.get("port", 80)),
+            float(settings.get("timeout_seconds", 5)),
+        )
+        values, observed_at = observation_values(payload, state)
+        write_weather(weather_path, values, observed_at)
+        save_state(state_path, state)
+        return 0
+    except Exception as first_error:
+        discovered = discover_ip_via_wlll() if not configured_host else None
+        if discovered and discovered != host:
+            try:
+                payload = http_get_current_conditions(
+                    discovered,
+                    int(settings.get("port", 80)),
+                    float(settings.get("timeout_seconds", 5)),
+                )
+                values, observed_at = observation_values(payload, state)
+                state["ip"] = discovered
+                write_weather(weather_path, values, observed_at)
+                save_state(state_path, state)
+                return 0
+            except Exception as retry_error:
+                first_error = retry_error
+        write_error(error_path, f"Weather unavailable: {first_error}")
+        return 1
 
-    # ---- Write output file (same line order as your old script) ----
-    with open(WEATHER_TXT_PATH, "w") as weatherFile:
-        print(f"{hours_minutes}", file=weatherFile)
-        print(f"{dir_out:03}", file=weatherFile)
-        print(f"{round(wind_kt_1min)}", file=weatherFile)
-        print(f"{round(gust_kt_2)}", file=weatherFile)
-        print(f"{altimeter:.2f}", file=weatherFile)
-        print(f"{temp_c}", file=weatherFile)
-        print(f"{dew_c}", file=weatherFile)
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=Path, default=Path(__file__).with_name("config.yaml"))
+    parser.add_argument("--base", type=Path, default=Path(os.environ.get("MYAWOS_BASE", "/home/user/weather_station")))
+    args = parser.parse_args()
+    return refresh(load_config(args.config), args.base)
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

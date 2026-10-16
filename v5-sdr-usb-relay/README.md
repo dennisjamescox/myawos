@@ -1,58 +1,82 @@
-# MyAWOS v5: SDR, USB relay, and cloud integration
+# MyAWOS v5 — SDR receiver and USB-relay radio transmitter
 
-This version builds the spoken WAV, text advisory, and PNG from one weather
-snapshot. `get_clouds_from_awc.py` caches AWC GFA model-derived cloud data in
-`clouds.json`. It performs no more than one network attempt every 30 minutes,
-even when scheduled runs overlap or an AWC request fails.
+This directory contains the current full MyAWOS runtime. It produces a single
+weather snapshot and uses that snapshot for the spoken WAV, text advisory, and
+weather PNG. Five valid clicks on the configured primary frequency can key a
+connected aviation radio and play the latest report.
 
-Cloud heights from this product are MSL. Outputs deliberately identify them as
-"AWC Estimated clouds" so they are not confused with an on-field observed
-ceiling.
+## Current capabilities
+
+- Direct local WeatherLink Live observations; the optional discovery library
+  is no longer required.
+- A hard 12-hour freshness cutoff. When observations are unavailable or stale,
+  all products say **“No weather available at this time”** instead of reading
+  old conditions.
+- AWC GFA model-estimated cloud layers, clearly labeled **AWC Estimated**, with
+  a 30-minute request limiter and last-known-good cache.
+- HackRF or Airspy receive support with relative-noise click detection.
+- USB-relay PTT and ALSA audio playback through a connected aviation radio.
+- Configurable 85% default master playback level.
+- Optional multi-frequency live monitoring and gated recording for aircraft
+  configured by the operator.
+- Daily HTML status/weather email scheduled for sunrise plus 10 minutes.
+- No credentials, email addresses, aircraft, SDR serials, or private network
+  destinations embedded in source defaults.
 
 ## Runtime flow
 
-1. `weather.py` writes the seven station observations to `weather.txt`.
+1. `weather.py` fetches the local station and atomically writes `weather.txt`.
 2. `get_clouds_from_awc.py` refreshes or reuses `clouds.json`.
-3. The two Perl converters generate `generate.sh` and `current_sms.txt`.
-4. `generate.sh` atomically replaces `current.wav`.
-5. `awos_to_image.py` atomically replaces the PNG from the same text advisory.
+3. The Perl converters create `generate.sh` and `current_sms.txt`.
+4. `generate.sh` atomically replaces `current.wav` from matching voice clips.
+5. `awos_to_image.py` atomically replaces the text weather PNG.
+6. `click_listen.py` detects the click sequence and, when explicitly enabled,
+   controls the relay while `aplay` sends `current.wav` to the radio.
 
-AWC failures use last-known-good cloud data for up to two hours. Older cloud
-data is omitted. Set `MYAWOS_LAT`, `MYAWOS_LON`, or `MYAWOS_BASE` to override
-the deployment defaults.
+See the [architecture guide](docs/architecture.md) for the full data flow and
+source layout.
 
-The additional fixed voice clips are in the repository `media` directory and
-must be deployed with the other `WeatherStation_*.wav` files. Compound cloud
-phrases are assembled from the matching-voice word and phrase recordings so
-the vocabulary can be reused across GFA layer combinations.
+## Quick start
 
-An example of the generated cloud-enhanced image is available at
-[`docs/rwj_awos-example.png`](docs/rwj_awos-example.png). The live, repeatedly
-generated PNG and WAV outputs are intentionally ignored by Git.
-
-## HackRF Pro click detection
-
-`click_listen.py` supports `sdr.device: hackrf` and `sdr.device: airspy`. The
-HackRF backend consumes signed 8-bit quadrature samples, offsets tuning away
-from the center/DC spike, measures a narrow channel around the configured
-frequency, and calibrates click thresholds relative to the local noise floor.
-
-Start a manual receive-only calibration with:
-
-```shell
-python3 click_listen.py --monitor-only --print-levels
+```bash
+cd v5-sdr-usb-relay
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+cp config.yaml config.local.yaml
 ```
 
-For contained lab testing only, `hackrf_transmit_once.py` generates conventional
-AM IQ from `current.wav` and transmits it exactly once. It defaults to the lowest
-HackRF TX gain with the RF amplifier disabled. RF transmission requires the
-explicit `--confirm-contained-rf` flag.
+Edit `config.local.yaml`, then validate receive-only operation:
 
-The source configuration defaults both transmit safety gates to false. A
-contained-lab deployment enables automatic transmission only when both
-`safety.transmit_enabled` and `safety.contained_rf_confirmed` are true.
-After five clicks within four seconds, the detector stops the half-duplex receive
-stream, transmits `current.wav` once, restarts reception in a `finally` block,
-and recalibrates the noise floor. A 30-second trigger cooldown remains active.
-Set either safety gate to false, or start with `--monitor-only`, before removing
-the dummy load, attenuated test path, or shielded enclosure.
+```bash
+python3 weather.py --config config.local.yaml --base "$PWD"
+python3 click_listen.py --config config.local.yaml --monitor-only --print-levels
+```
+
+Do not enable transmission until the wiring, audio level, frequency,
+authorization, and fail-safe PTT-off behavior have been checked. The complete
+procedure is in [Getting started](docs/getting-started.md).
+
+## Documentation
+
+- [Getting started](docs/getting-started.md)
+- [Architecture and source flow](docs/architecture.md)
+- [Hardware and wiring](docs/hardware.md)
+- [Configuration](docs/configuration.md)
+- [Operations and troubleshooting](docs/operations.md)
+- [Privacy and security](docs/privacy-security.md)
+
+The generated example is available at
+[`docs/rwj_awos-example.png`](docs/rwj_awos-example.png). Generated live WAV,
+PNG, text, log, cache, database, and recording files are intentionally ignored
+by Git.
+
+## Test
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m py_compile *.py
+perl -c convert_weather_txt_to_wav.pl
+perl -c convert_weather_txt_to_sms.pl
+bash -n weather_loop.sh
+```

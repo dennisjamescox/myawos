@@ -1,0 +1,10 @@
+[Unit]
+Description=Send the MyAWOS daily weather and radio usage email
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/user/weather_station/daily_weather_email.py --config /home/user/weather_station/daily_weather_email.yaml --scheduled
+Restart=on-failure
+RestartSec=15min

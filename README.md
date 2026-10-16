@@ -1,14 +1,34 @@
-# myawos
-Unofficial Automated Weather Observation System for Aviation
+# MyAWOS
 
-Head to http://www.myawos.com for more information
-Youtube video of basic usage at https://www.youtube.com/watch?v=FBAT3nj8eYA
-Google doc (probably out of date) - https://docs.google.com/document/d/1_eoEnQV1TYgR1ly49MTz6m14C6vOJlMLABnWIvQNgT8/edit?usp=sharing
+MyAWOS is an open-source, community-built weather information system for
+private airports and airparks. It combines a local weather station, an SDR
+receiver, an aviation radio, and a USB relay to provide an on-demand spoken
+weather report after a configured click sequence.
 
-There are multiple versions of the code - the baseline is tagged baseline07. If you grab that its a basic working set of the code. 
-Johann has made some massive improvements - removing the Arduino, using a optrelay, multiple clicker usage, computer generated voice, etc. 
+The current implementation is in [`v5-sdr-usb-relay`](v5-sdr-usb-relay/).
+It adds direct WeatherLink Live access, safely cached AWC estimated cloud
+information, generated audio/text/PNG products, SDR click detection, radio PTT
+through a USB relay, optional receive-audio capture, and a daily status email.
 
-Its best if you get a basic version up first then start modifying with all the different variants aviable. Here is a baseline version https://www.dropbox.com/s/mq76vtjqxfsiegp/weather_station.tar.gz?dl=0
+## Start here
 
-First step - get yourself a Raspberry Pi 4, Ardunio Uno, Davis Weather Station or Ecowitt (not nearly as good as the Davis IMHO) and an aviation radio.
-The wiring is quite simple - just contact me if you need help.
+- [Project website](https://dennisjamescox.github.io/myawos/)
+- [Getting started](v5-sdr-usb-relay/docs/getting-started.md)
+- [System architecture](v5-sdr-usb-relay/docs/architecture.md)
+- [Hardware and wiring](v5-sdr-usb-relay/docs/hardware.md)
+- [Configuration reference](v5-sdr-usb-relay/docs/configuration.md)
+- [Operations and troubleshooting](v5-sdr-usb-relay/docs/operations.md)
+- [Privacy and security](v5-sdr-usb-relay/docs/privacy-security.md)
+
+New users who want the smallest supported installation should also consider
+[MyAWOS Lite](https://dennisjamescox.github.io/myawos-lite/).
+
+## Safety
+
+MyAWOS is not an FAA-certified AWOS and is not a substitute for certified
+weather sources, pilot judgment, or required airport equipment. Radio
+installation and operation must comply with applicable rules and station
+authorization. Public source defaults keep automatic transmission disabled.
+
+Copyright © 2019–2026 Dennis Cox. See the repository history for additional
+contributors and earlier hardware variants.

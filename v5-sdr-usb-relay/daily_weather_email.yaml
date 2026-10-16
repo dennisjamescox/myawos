@@ -1,0 +1,39 @@
+airport: "YOUR-AIRPORT"
+timezone: "America/Chicago"
+camera_image: "/home/user/weather_camera/rwj_weather_cam.jpg"
+weather_report: "/home/user/weather_station/current_sms.txt"
+weather_source: "/home/user/weather_station/weather.txt"
+weather_max_age_hours: 12
+request_log_directory: "/home/user/weather_station"
+lock_file: "/run/user/1000/myawos-daily-email.lock"
+
+location:
+  latitude: 0.0
+  longitude: 0.0
+
+schedule:
+  sunrise_offset_minutes: 10
+  state_file: "/home/user/weather_station/daily_email_last_sent.txt"
+
+status:
+  max_file_age_minutes: 30
+  piaware_status_url: "http://piaware.local/status.json"
+  piaware_timeout_seconds: 5
+  disk_path: "/home/user/weather_camera_archive"
+  disk_warning_percent: 75
+
+email:
+  from: "sender@example.com"
+  to: "recipient@example.com"
+
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  username: "sender@example.com"
+  password_file: "/home/user/.weather_station_authentication/daily_email_password"
+  starttls: true
+  ssl: false
+
+forecast:
+  station: "KXXX"
+  label: "Nearest NOAA NBM station"

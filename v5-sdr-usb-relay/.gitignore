@@ -9,3 +9,13 @@ current_sms.txt
 rwj_awos.png
 __pycache__/
 *.pyc
+daily-report-preview.eml
+daily-report-preview.html
+config.local.yaml
+daily_weather_email.local.yaml
+weather.txt
+weather_error.txt
+weatherlink_state.json
+radio_captures/
+*.sqlite
+*.log

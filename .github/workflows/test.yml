@@ -1,0 +1,28 @@
+name: Test MyAWOS v5
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v5-sdr-usb-relay
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: v5-sdr-usb-relay/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: python3 -m unittest discover -s tests -v
+      - run: python3 -m py_compile *.py
+      - run: perl -c convert_weather_txt_to_wav.pl
+      - run: perl -c convert_weather_txt_to_sms.pl
+      - run: bash -n weather_loop.sh

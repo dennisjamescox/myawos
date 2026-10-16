@@ -1,0 +1,11 @@
+[Unit]
+Description=Stage the MyAWOS daily report for sunrise plus 10 minutes
+
+[Timer]
+OnCalendar=*-*-* 00:05:00 America/Chicago
+Persistent=true
+AccuracySec=1min
+Unit=myawos-daily-email.service
+
+[Install]
+WantedBy=timers.target

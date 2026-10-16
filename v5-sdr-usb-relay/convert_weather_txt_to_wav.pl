@@ -13,6 +13,8 @@ my $MEDIA     = "$BASE/media";
 my $OUT_WAV   = "$BASE/current.wav";
 my $CLOUDS_JSON = "$BASE/clouds.json";
 my $TEMP_WAV = "$BASE/.current.tmp.wav";
+my $MAX_WEATHER_AGE_HOURS = $ENV{MYAWOS_WEATHER_MAX_AGE_HOURS} // 12;
+my $UNAVAILABLE_WAV = "$MEDIA/WeatherStation_no_weather_available_at_this_time.wav";
 
 # Audio output params
 my $SOX_BITS   = 8;
@@ -75,6 +77,19 @@ my %CLIP = (
 
 for my $clip (values %CLIP) {
   require_clip($clip);
+}
+
+if (!weather_is_fresh($WEATHER_TXT, $MAX_WEATHER_AGE_HOURS)) {
+  require_clip($UNAVAILABLE_WAV);
+  my ($gen_fh, $temp_script) = tempfile(".generate.XXXXXX", DIR => dirname($GEN_SH), UNLINK => 0);
+  print {$gen_fh} "#!/bin/sh\n";
+  print {$gen_fh} "sox $UNAVAILABLE_WAV -b $SOX_BITS -c $SOX_CHANS $TEMP_WAV ";
+  print {$gen_fh} "gain -3 rate -v $SOX_RATE silence 1 0.17 0.1% -1 0.17 0.1% ";
+  print {$gen_fh} "&& mv -f $TEMP_WAV $OUT_WAV\n";
+  close $gen_fh;
+  rename $temp_script, $GEN_SH;
+  chmod 0755, $GEN_SH;
+  exit 0;
 }
 
 
@@ -256,4 +271,11 @@ sub weather_file_age_hours {
   $hours = 1 if $hours < 1;
 
   return $hours;
+}
+
+sub weather_is_fresh {
+  my ($path, $max_age_hours) = @_;
+  my @stat = stat($path);
+  return 0 unless @stat;
+  return (time() - $stat[9]) < ($max_age_hours * 3600);
 }

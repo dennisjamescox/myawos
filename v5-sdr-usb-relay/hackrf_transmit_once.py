@@ -95,7 +95,7 @@ def main() -> int:
     parser.add_argument("--audio", type=Path, default=Path("/home/user/weather_station/current.wav"))
     parser.add_argument("--frequency-mhz", type=float, default=122.700)
     parser.add_argument("--sample-rate", type=int, default=2_000_000)
-    parser.add_argument("--serial", default="0000000000000000977c64de2d3b4d13")
+    parser.add_argument("--serial", default="", help="optional HackRF serial number")
     parser.add_argument("--tx-gain", type=int, default=0)
     parser.add_argument("--modulation-index", type=float, default=0.75)
     parser.add_argument("--carrier-scale", type=float, default=0.5)
@@ -134,8 +134,9 @@ def main() -> int:
         "-a", "0",
         "-x", str(args.tx_gain),
         "-b", "1750000",
-        "-d", args.serial,
     ]
+    if args.serial:
+        command.extend(["-d", args.serial])
     print(
         f"Transmitting once at {args.frequency_mhz:.6f} MHz for {duration:.2f} seconds, "
         f"RF amp off, TX gain {args.tx_gain} dB",

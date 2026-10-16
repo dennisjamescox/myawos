@@ -1,13 +1,14 @@
 [Unit]
-Description=MyAWOS HackRF five-click detector and contained-lab transmitter
+Description=MyAWOS SDR five-click detector and connected radio transmitter
 After=default.target
 
 [Service]
 Type=simple
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python3 /home/user/weather_station/hackrf_click_listen.py --config /home/user/weather_station/hackrf_config.yaml
-Restart=on-failure
-RestartSec=3
+WorkingDirectory=/home/user/weather_station
+ExecStart=/usr/bin/python3 /home/user/weather_station/click_listen.py --config /home/user/weather_station/config.yaml
+Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=default.target
