@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="See the upcoming MyAWOS local operations dashboard using real screens from the working station: weather, airspace, radio, FAA camera archives, fleet history, and FAA Registry exploration.">
   <title>Upcoming dashboard · MyAWOS</title>
-  <link rel="stylesheet" href="styles.css?v=20261016-3">
+  <link rel="stylesheet" href="styles.css?v=20261016-4">
 </head>
 <body class="upcoming-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -40,7 +40,10 @@
         <p class="capture-note"><span></span>Every screen below was captured from the operating local MyAWOS system on October 16, 2026. No demonstration records were invented.</p>
       </div>
       <div class="shell hero-screenshot-wrap">
-        <img src="assets/dashboard-live-airspace.jpg" alt="The real MyAWOS dashboard showing system health and live ADS-B traffic near 54T" width="1265" height="712">
+        <button class="screenshot-zoom" type="button" data-full="assets/dashboard-live-airspace.jpg" aria-label="Open the live airspace dashboard image at full size">
+          <img src="assets/dashboard-live-airspace.jpg" alt="The real MyAWOS dashboard showing system health and live ADS-B traffic near 54T" width="1265" height="712">
+          <span>View full size</span>
+        </button>
         <div class="screenshot-key"><span>REAL LOCAL OPERATIONS</span><span>LIVE ADS-B</span><span>AUTOMATIC RANGE</span></div>
       </div>
     </section>
@@ -74,7 +77,10 @@
       </div>
       <div class="shell">
         <figure class="showcase-frame">
-          <img src="assets/dashboard-weather-camera.jpg" alt="Real MyAWOS weather and FAA weather camera panels showing current conditions at 54T" width="1265" height="712" loading="lazy">
+          <button class="screenshot-zoom" type="button" data-full="assets/dashboard-weather-camera.jpg" aria-label="Open the weather and camera dashboard image at full size">
+            <img src="assets/dashboard-weather-camera.jpg" alt="Real MyAWOS weather and FAA weather camera panels showing current conditions at 54T" width="1265" height="712" loading="lazy">
+            <span>View full size</span>
+          </button>
           <figcaption>Live station capture: weather at 54T, AWC Estimated clouds, runway 32 recommendation, crosswind calculation, recent radio requests, and the FAA weather camera.</figcaption>
         </figure>
         <div class="feature-points">
@@ -92,7 +98,10 @@
       </div>
       <div class="shell">
         <figure class="showcase-frame dark-frame">
-          <img src="assets/dashboard-airport-movements.jpg" alt="Real MyAWOS airport movements table enriched with FAA registration information" width="1265" height="712" loading="lazy">
+          <button class="screenshot-zoom" type="button" data-full="assets/dashboard-airport-movements.jpg" aria-label="Open the airport movements dashboard image at full size">
+            <img src="assets/dashboard-airport-movements.jpg" alt="Real MyAWOS airport movements table enriched with FAA registration information" width="1265" height="712" loading="lazy">
+            <span>View full size</span>
+          </button>
           <figcaption>Actual local movement history enriched with aircraft type, legal registrant, city and state, FAA category, registry counts, and direct FlightAware links.</figcaption>
         </figure>
         <div class="feature-points dark-points">
@@ -126,11 +135,17 @@
       </div>
       <div class="shell registry-grid">
         <figure class="showcase-frame">
-          <img src="assets/registry-search-results.jpg" alt="Actual FAA Registry Explorer search results for the Cessna 172 family in Texas" width="1265" height="712" loading="lazy">
+          <button class="screenshot-zoom" type="button" data-full="assets/registry-search-results.jpg" aria-label="Open the FAA Registry search results image at full size">
+            <img src="assets/registry-search-results.jpg" alt="Actual FAA Registry Explorer search results for the Cessna 172 family in Texas" width="1265" height="712" loading="lazy">
+            <span>View full size</span>
+          </button>
           <figcaption>A real family search for Cessna 172 aircraft in Texas returned 1,776 matching registry records.</figcaption>
         </figure>
         <figure class="showcase-frame">
-          <img src="assets/registry-aircraft-detail.jpg" alt="Actual FAA Registry Explorer aircraft detail page for a Boeing 737 operated by United Airlines" width="1265" height="712" loading="lazy">
+          <button class="screenshot-zoom" type="button" data-full="assets/registry-aircraft-detail.jpg" aria-label="Open the FAA Registry aircraft detail image at full size">
+            <img src="assets/registry-aircraft-detail.jpg" alt="Actual FAA Registry Explorer aircraft detail page for a Boeing 737 operated by United Airlines" width="1265" height="712" loading="lazy">
+            <span>View full size</span>
+          </button>
           <figcaption>Aircraft detail keeps observed operator and FAA legal registrant separate, with live ADS-B context and a direct FlightAware tracking link.</figcaption>
         </figure>
       </div>
@@ -148,7 +163,10 @@
       </div>
       <div class="shell archive-grid">
         <figure class="showcase-frame dark-frame">
-          <img src="assets/dashboard-most-active.jpg" alt="Real MyAWOS most active aircraft and aircraft type lists for the five nautical mile area" width="1265" height="712" loading="lazy">
+          <button class="screenshot-zoom" type="button" data-full="assets/dashboard-most-active.jpg" aria-label="Open the most active aircraft dashboard image at full size">
+            <img src="assets/dashboard-most-active.jpg" alt="Real MyAWOS most active aircraft and aircraft type lists for the five nautical mile area" width="1265" height="712" loading="lazy">
+            <span>View full size</span>
+          </button>
           <figcaption>The real five-nautical-mile activity summary ranks both N-numbers and aircraft types from locally collected observations.</figcaption>
         </figure>
         <div class="release-list">
@@ -189,6 +207,13 @@
     </section>
   </main>
 
+  <div class="image-lightbox" hidden role="dialog" aria-modal="true" aria-label="Full-size dashboard image">
+    <button class="lightbox-close" type="button" aria-label="Close full-size image">Close ×</button>
+    <div class="lightbox-scroller">
+      <img class="lightbox-image" src="" alt="">
+    </div>
+  </div>
+
   <footer>
     <div class="shell footer-grid">
       <div>MyAWOS · Airport weather over radio</div>
@@ -201,6 +226,38 @@
     button.addEventListener('click', () => {
       const open = nav.classList.toggle('open');
       button.setAttribute('aria-expanded', String(open));
+    });
+
+    const lightbox = document.querySelector('.image-lightbox');
+    const lightboxImage = document.querySelector('.lightbox-image');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    let returnFocus = null;
+
+    function closeImage() {
+      lightbox.hidden = true;
+      lightboxImage.src = '';
+      document.body.classList.remove('lightbox-open');
+      if (returnFocus) returnFocus.focus();
+    }
+
+    document.querySelectorAll('.screenshot-zoom').forEach(zoomButton => {
+      zoomButton.addEventListener('click', () => {
+        const preview = zoomButton.querySelector('img');
+        returnFocus = zoomButton;
+        lightboxImage.src = zoomButton.dataset.full;
+        lightboxImage.alt = preview.alt;
+        lightbox.hidden = false;
+        document.body.classList.add('lightbox-open');
+        lightbox.querySelector('.lightbox-scroller').scrollTo(0, 0);
+        lightboxClose.focus();
+      });
+    });
+    lightboxClose.addEventListener('click', closeImage);
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox) closeImage();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !lightbox.hidden) closeImage();
     });
   </script>
 </body>
