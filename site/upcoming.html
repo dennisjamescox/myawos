@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="See the upcoming MyAWOS local operations dashboard using real screens from the working station: weather, airspace, radio, FAA camera archives, fleet history, and FAA Registry exploration.">
+  <title>Upcoming dashboard · MyAWOS</title>
+  <link rel="stylesheet" href="styles.css?v=20261016-3">
+</head>
+<body class="upcoming-page">
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <div class="shell nav">
+      <a class="brand" href="index.html"><span class="brand-mark">AW</span>MyAWOS</a>
+      <button class="menu" aria-expanded="false" aria-label="Open navigation">Menu</button>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="getting-started.html">Get started</a></li>
+          <li><a href="architecture.html">Architecture</a></li>
+          <li><a href="hardware.html">Hardware</a></li>
+          <li><a href="features.html">Features</a></li>
+          <li><a aria-current="page" href="upcoming.html">Upcoming</a></li>
+          <li><a href="documentation.html">Docs</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="upcoming-hero">
+      <div class="shell upcoming-hero-copy">
+        <div class="eyebrow">Upcoming · local operations dashboard</div>
+        <h1>The airport, weather, radio, and history—together.</h1>
+        <p class="lede">The next chapter of full MyAWOS turns the station computer into a browser-based operations display. Live conditions, nearby traffic, captured radio activity, camera history, aircraft records, and system health live in one calm view.</p>
+        <div class="actions">
+          <a class="button" href="#tour">Tour the real system →</a>
+          <a class="button secondary" href="features.html">See the current core</a>
+        </div>
+        <p class="capture-note"><span></span>Every screen below was captured from the operating local MyAWOS system on October 16, 2026. No demonstration records were invented.</p>
+      </div>
+      <div class="shell hero-screenshot-wrap">
+        <img src="assets/dashboard-live-airspace.jpg" alt="The real MyAWOS dashboard showing system health and live ADS-B traffic near 54T" width="1265" height="712">
+        <div class="screenshot-key"><span>REAL LOCAL OPERATIONS</span><span>LIVE ADS-B</span><span>AUTOMATIC RANGE</span></div>
+      </div>
+    </section>
+
+    <section class="upcoming-intro">
+      <div class="shell statement-grid">
+        <div>
+          <div class="eyebrow">Why this exists</div>
+          <h2>A station should explain itself.</h2>
+        </div>
+        <div>
+          <p>MyAWOS began with a focused job: hear microphone clicks and transmit current airport weather. The dashboard keeps that radio path intact while making the station’s other knowledge visible to the people operating it.</p>
+          <p>It is local-first. Core operation does not require a subscription, archives remain under the station owner’s control, and optional internet services are deliberate and budget-limited.</p>
+        </div>
+      </div>
+      <div class="shell system-flow" aria-label="MyAWOS dashboard data flow">
+        <div class="flow-column">
+          <span>Weather station</span><span>FAA weather camera</span><span>Radio receiver</span><span>Local PiAware</span><span>FAA monthly data</span>
+        </div>
+        <div class="flow-core"><strong>MyAWOS</strong><span>local operations</span><small>one computer · one browser</small></div>
+        <div class="flow-column">
+          <span>Current weather</span><span>Live airspace</span><span>Audio archive</span><span>Aircraft history</span><span>Daily health report</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="tour">
+      <div class="shell showcase-heading">
+        <div><div class="eyebrow">01 · Weather and camera</div><h2>Current conditions with operational context.</h2></div>
+        <p>Weather, freshness, estimated cloud information, favored runway, crosswind component, radio requests, and the FAA camera are presented together. Stale station data is rejected instead of repeated as current.</p>
+      </div>
+      <div class="shell">
+        <figure class="showcase-frame">
+          <img src="assets/dashboard-weather-camera.jpg" alt="Real MyAWOS weather and FAA weather camera panels showing current conditions at 54T" width="1265" height="712" loading="lazy">
+          <figcaption>Live station capture: weather at 54T, AWC Estimated clouds, runway 32 recommendation, crosswind calculation, recent radio requests, and the FAA weather camera.</figcaption>
+        </figure>
+        <div class="feature-points">
+          <article><b>Freshness is a safety feature</b><span>When the station stops updating beyond its configured limit, MyAWOS replaces old values with “No weather available at this time” in voice, graphics, dashboard, and health reporting.</span></article>
+          <article><b>Camera history without gaps</b><span>Every capture can be retained, stepped forward or backward, returned to current, expanded full-screen, or animated at a user-selected speed and time range.</span></article>
+          <article><b>Runway intelligence</b><span>Wind is translated into a favored runway and crosswind component while the original observations remain visible.</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section dark-section">
+      <div class="shell showcase-heading">
+        <div><div class="eyebrow">02 · Airspace and airport movement</div><h2>See what is happening around the airport.</h2></div>
+        <p>The FlightWall-style strip favors the nearest traffic. Automatic range begins at five nautical miles, expands when the sky is quiet, and contracts when nearby aircraft return.</p>
+      </div>
+      <div class="shell">
+        <figure class="showcase-frame dark-frame">
+          <img src="assets/dashboard-airport-movements.jpg" alt="Real MyAWOS airport movements table enriched with FAA registration information" width="1265" height="712" loading="lazy">
+          <figcaption>Actual local movement history enriched with aircraft type, legal registrant, city and state, FAA category, registry counts, and direct FlightAware links.</figcaption>
+        </figure>
+        <div class="feature-points dark-points">
+          <article><b>Useful ADS-B at a glance</b><span>Flight or tail number, aircraft type, altitude, speed, distance, direction, trend, operator, and location are arranged for quick scanning.</span></article>
+          <article><b>Identity that goes beyond a trustee</b><span>ICAO callsign data, observed operator associations, and legal FAA registration are kept distinct so an airline can be recognized without rewriting the official owner.</span></article>
+          <article><b>One click to the record</b><span>Tail numbers and count badges open local registry detail and filtered exploration pages; FlightAware remains a normal website link with no API charge.</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <div class="shell radio-story">
+        <div class="radio-frequency">
+          <span>PRIORITY CHANNEL</span>
+          <strong>122.700</strong>
+          <div class="radio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="radio-copy">
+          <div class="eyebrow">03 · Radio memory</div>
+          <h2>Listen live. Keep the moments that matter.</h2>
+          <p>Start Live Audio to monitor the primary field frequency and selected auxiliary channels. Voice-length recordings can be reviewed in the browser, while permanent archives preserve matched transmissions for configured fleet aircraft.</p>
+          <div class="honesty-note">Audio-to-aircraft matching combines timing and nearby ADS-B activity. The dashboard presents the evidence clearly, but does not claim voice identification from radio audio alone.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section registry-showcase">
+      <div class="shell showcase-heading">
+        <div><div class="eyebrow">04 · FAA Registry Explorer</div><h2>Turn a monthly snapshot into something worth exploring.</h2></div>
+        <p>The dashboard does not merely display registration data. It links aircraft, models, owners, operators, cities, states, and counts into a local research tool.</p>
+      </div>
+      <div class="shell registry-grid">
+        <figure class="showcase-frame">
+          <img src="assets/registry-search-results.jpg" alt="Actual FAA Registry Explorer search results for the Cessna 172 family in Texas" width="1265" height="712" loading="lazy">
+          <figcaption>A real family search for Cessna 172 aircraft in Texas returned 1,776 matching registry records.</figcaption>
+        </figure>
+        <figure class="showcase-frame">
+          <img src="assets/registry-aircraft-detail.jpg" alt="Actual FAA Registry Explorer aircraft detail page for a Boeing 737 operated by United Airlines" width="1265" height="712" loading="lazy">
+          <figcaption>Aircraft detail keeps observed operator and FAA legal registrant separate, with live ADS-B context and a direct FlightAware tracking link.</figcaption>
+        </figure>
+      </div>
+      <div class="shell registry-points">
+        <article><b>Search naturally</b><span>Find an N-number, partial model family, owner, city, state, country, or aircraft within a chosen radius of a location.</span></article>
+        <article><b>Follow the counts</b><span>Parenthetical totals for type, registrant, and city/state are links—not dead statistics—so every answer can become the next question.</span></article>
+        <article><b>Rich aircraft profiles</b><span>Serial number, manufacture year, model, category, certification, engine, Mode S code, registry status, document index, and cautious Airmen matches are available from the local snapshot.</span></article>
+      </div>
+    </section>
+
+    <section class="showcase-section dark-section activity-section">
+      <div class="shell showcase-heading">
+        <div><div class="eyebrow">05 · History that belongs to you</div><h2>Keep the record. Understand the storage.</h2></div>
+        <p>Aircraft observations, selected radio audio, FAA camera frames, and flight history can be retained permanently. MyAWOS measures each archive separately before asking the owner to choose limits.</p>
+      </div>
+      <div class="shell archive-grid">
+        <figure class="showcase-frame dark-frame">
+          <img src="assets/dashboard-most-active.jpg" alt="Real MyAWOS most active aircraft and aircraft type lists for the five nautical mile area" width="1265" height="712" loading="lazy">
+          <figcaption>The real five-nautical-mile activity summary ranks both N-numbers and aircraft types from locally collected observations.</figcaption>
+        </figure>
+        <div class="release-list">
+          <article><b>My Fleet Archive</b><span>Configured aircraft receive durable ADS-B, flight, and matched audio histories with browser playback and CSV exports.</span></article>
+          <article><b>Transparent storage</b><span>A green, yellow, or red gear reflects total disk use. The storage page shows which categories consume space before the user sets a limit or deletes anything.</span></article>
+          <article><b>Daily operational email</b><span>At local sunrise plus ten minutes, the station can report weather, the latest camera view, radio request activity, MOS, PiAware status, and storage warnings.</span></article>
+          <article><b>Optional enrichment with a ceiling</b><span>FlightAware AeroAPI enrichment runs only when a person is actively using the dashboard and is guarded by a rolling budget below five dollars per month.</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="release-section">
+      <div class="shell release-grid">
+        <div>
+          <div class="eyebrow">Release direction</div>
+          <h2>A full operations layer, built on the working station.</h2>
+          <p>The dashboard is being developed alongside the deployed MyAWOS radio and weather system. The public release will focus on configurable station identity, fleet lists, local retention, safe defaults, and documentation that explains both wiring and data flow.</p>
+        </div>
+        <ol>
+          <li><b>Make installation repeatable</b><span>Remove station-specific assumptions and document the supported hardware paths.</span></li>
+          <li><b>Keep local operation first</b><span>Weather, radio response, archives, and the dashboard continue to work without a paid data service.</span></li>
+          <li><b>Publish only after validation</b><span>Test the deployed path, privacy defaults, upgrades, backups, and recovery before calling it ready.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="upcoming-cta">
+      <div class="shell">
+        <div>
+          <div class="eyebrow">MyAWOS today</div>
+          <h2>Start with the dependable weather-radio core.</h2>
+        </div>
+        <div class="actions">
+          <a class="button" href="getting-started.html">Getting started →</a>
+          <a class="button secondary" href="architecture.html">Understand the architecture</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div>MyAWOS · Airport weather over radio</div>
+      <div><a href="documentation.html">Documentation</a> · <a href="https://github.com/dennisjamescox/myawos">GitHub repository</a></div>
+    </div>
+  </footer>
+  <script>
+    const button = document.querySelector('.menu');
+    const nav = document.querySelector('nav');
+    button.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      button.setAttribute('aria-expanded', String(open));
+    });
+  </script>
+</body>
+</html>
