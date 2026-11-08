@@ -88,6 +88,9 @@ th { color: #123e53; }
 footer { padding: 42px 0; color: var(--muted); border-top: 1px solid var(--line); }
 .footer-grid { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
 footer a { color: #fff; }
+.footer-credits { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .9rem; }
+.footer-credits p { margin: 0 0 10px; }
+.footer-credits p:last-child { margin-bottom: 0; }
 
 /* Upcoming local operations showcase */
 .upcoming-page { background: #061725; }
